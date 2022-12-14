@@ -29,11 +29,11 @@ impl Field for RistrettoScalarField {
     type Serialization = [u8; 32];
 
     fn zero() -> Self::Scalar {
-        Scalar::zero()
+        Scalar::ZERO
     }
 
     fn one() -> Self::Scalar {
-        Scalar::one()
+        Scalar::ONE
     }
 
     fn invert(scalar: &Self::Scalar) -> Result<Self::Scalar, FieldError> {
@@ -54,8 +54,11 @@ impl Field for RistrettoScalarField {
         scalar.to_bytes()
     }
 
-    fn deserialize(buf: &Self::Serialization) -> Result<Self::Scalar, FieldError> {
-        match Scalar::from_canonical_bytes(*buf) {
+    fn deserialize(
+        buf: &Self::Serialization,
+    ) -> Result<Self::Scalar, FieldError> {
+        let ct_option = Scalar::from_canonical_bytes(*buf);
+        match ct_option.into() {
             Some(s) => Ok(s),
             None => Err(FieldError::MalformedScalar),
         }
@@ -78,7 +81,7 @@ impl Group for RistrettoGroup {
     type Serialization = [u8; 32];
 
     fn cofactor() -> <Self::Field as Field>::Scalar {
-        Scalar::one()
+        Scalar::ONE
     }
 
     fn identity() -> Self::Element {
@@ -93,7 +96,9 @@ impl Group for RistrettoGroup {
         element.compress().to_bytes()
     }
 
-    fn deserialize(buf: &Self::Serialization) -> Result<Self::Element, GroupError> {
+    fn deserialize(
+        buf: &Self::Serialization,
+    ) -> Result<Self::Element, GroupError> {
         match CompressedRistretto::from_slice(buf.as_ref()).decompress() {
             Some(point) => {
                 if point == Self::identity() {
@@ -194,7 +199,9 @@ impl Ciphersuite for Ristretto255Sha512 {
     }
 
     /// HDKG for FROST(ristretto255, SHA-512)
-    fn HDKG(m: &[u8]) -> Option<<<Self::Group as Group>::Field as Field>::Scalar> {
+    fn HDKG(
+        m: &[u8],
+    ) -> Option<<<Self::Group as Group>::Field as Field>::Scalar> {
         let h = Sha512::new()
             .chain(CONTEXT_STRING.as_bytes())
             .chain("dkg")
@@ -293,7 +300,12 @@ pub mod keys {
             min_signers: u16,
             mut rng: R,
         ) -> Result<(Round1SecretPackage, Round1Package), Error> {
-            frost::keys::dkg::keygen_part1(identifier, max_signers, min_signers, &mut rng)
+            frost::keys::dkg::keygen_part1(
+                identifier,
+                max_signers,
+                min_signers,
+                &mut rng,
+            )
         }
 
         /// Performs the second part of the distributed key generation protocol
@@ -324,7 +336,11 @@ pub mod keys {
             round1_packages: &[Round1Package],
             round2_packages: &[Round2Package],
         ) -> Result<(KeyPackage, PublicKeyPackage), Error> {
-            frost::keys::dkg::keygen_part3(round2_secret_package, round1_packages, round2_packages)
+            frost::keys::dkg::keygen_part3(
+                round2_secret_package,
+                round1_packages,
+                round2_packages,
+            )
         }
     }
 }

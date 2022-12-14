@@ -6,7 +6,11 @@ edition = "2021"
 # - Update CHANGELOG.md
 # - Create git tag.
 version = "0.1.0"
-authors = ["Deirdre Connolly <durumcrustulum@gmail.com>", "Chelsea Komlo <me@chelseakomlo.com>", "Conrado Gouvea <conradoplg@gmail.com>"]
+authors = [
+    "Deirdre Connolly <durumcrustulum@gmail.com>",
+    "Chelsea Komlo <me@chelseakomlo.com>",
+    "Conrado Gouvea <conradoplg@gmail.com>",
+]
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/ZcashFoundation/frost"
@@ -18,7 +22,10 @@ description = "A Schnorr signature scheme over the prime-order Ristretto group t
 features = ["nightly"]
 
 [dependencies]
-curve25519-dalek = { version = "4.0.0-pre.1", features = ["serde"] }
+curve25519-dalek = { version = "4.0.0-pre.4", features = [
+    "serde",
+    "rand_core",
+] }
 frost-core = { path = "../frost-core", features = ["test-impl"] }
 rand_core = "0.6"
 sha2 = "0.10.2"
