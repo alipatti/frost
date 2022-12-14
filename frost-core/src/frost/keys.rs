@@ -11,6 +11,7 @@ use std::{
 
 use hex::FromHex;
 use rand_core::{CryptoRng, RngCore};
+use serde::{Deserialize, Serialize};
 use zeroize::{DefaultIsZeroes, Zeroize};
 
 use crate::{
@@ -117,7 +118,7 @@ where
 }
 
 /// A secret scalar value representing a signer's share of the group secret.
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SigningShare<C: Ciphersuite>(pub(crate) Scalar<C>);
 
 impl<C> SigningShare<C>
@@ -225,7 +226,7 @@ where
 ///
 /// This is a (public) commitment to one coefficient of a secret polynomial used for performing
 /// verifiable secret sharing for a Shamir secret share.
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub(super) struct CoefficientCommitment<C: Ciphersuite>(pub(super) Element<C>);
 
 /// Contains the commitments to the coefficients for our secret polynomial _f_,
@@ -240,7 +241,7 @@ pub(super) struct CoefficientCommitment<C: Ciphersuite>(pub(super) Element<C>);
 /// [`VerifiableSecretSharingCommitment`], either by performing pairwise comparison, or by using
 /// some agreed-upon public location for publication, where each participant can
 /// ensure that they received the correct (and same) value.
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct VerifiableSecretSharingCommitment<C: Ciphersuite>(
     pub(super) Vec<CoefficientCommitment<C>>,
 );
@@ -256,7 +257,7 @@ pub struct VerifiableSecretSharingCommitment<C: Ciphersuite>(
 ///
 /// To derive a FROST keypair, the receiver of the [`SecretShare`] *must* call
 /// .into(), which under the hood also performs validation.
-#[derive(Clone, Zeroize)]
+#[derive(Clone, Zeroize, Serialize, Deserialize)]
 pub struct SecretShare<C: Ciphersuite> {
     /// The participant identifier of this [`SecretShare`].
     pub identifier: Identifier<C>,

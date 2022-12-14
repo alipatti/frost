@@ -1,11 +1,12 @@
 //! Schnorr signatures over prime order groups (or subgroups)
 
 use debugless_unwrap::DebuglessUnwrap;
+use serde::{Deserialize, Serialize};
 
 use crate::{Ciphersuite, Element, Error, Field, Group, Scalar};
 
 /// A Schnorr signature over some prime order group (or subgroup).
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Signature<C: Ciphersuite> {
     /// The commitment `R` to the signature nonce.
     pub(crate) R: Element<C>,

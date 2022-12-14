@@ -4,6 +4,7 @@ use std::fmt::{self, Debug};
 
 use hex::FromHex;
 use rand_core::{CryptoRng, RngCore};
+use serde::{Deserialize, Serialize};
 use zeroize::Zeroize;
 
 use crate::{frost, Ciphersuite, Element, Error, Field, Group, Scalar};
@@ -95,7 +96,7 @@ where
 }
 
 /// A Ristretto point that is a commitment to a signing nonce share.
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct NonceCommitment<C: Ciphersuite>(pub(super) Element<C>);
 
 impl<C> NonceCommitment<C>
@@ -208,7 +209,7 @@ where
 ///
 /// This step can be batched if desired by the implementation. Each
 /// SigningCommitment can be used for exactly *one* signature.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Serialize, Deserialize)]
 pub struct SigningCommitments<C: Ciphersuite> {
     /// The participant identifier.
     pub identifier: Identifier<C>,

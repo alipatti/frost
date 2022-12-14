@@ -111,7 +111,9 @@ pub trait Group: Copy + Clone + PartialEq {
         + Eq
         + Mul<<Self::Field as Field>::Scalar, Output = Self::Element>
         + PartialEq
-        + Sub<Output = Self::Element>;
+        + Sub<Output = Self::Element>
+        + Serialize
+        + DeserializeOwned;
 
     /// A unique byte array buf of fixed length N.
     ///
