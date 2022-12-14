@@ -29,6 +29,7 @@ curve25519-dalek = { version = "4.0.0-pre.4", features = [
 frost-core = { path = "../frost-core", features = ["test-impl"] }
 rand_core = "0.6"
 sha2 = "0.10.2"
+serde = { version = "1.0.148", features = ["derive"] }
 
 [dev-dependencies]
 bincode = "1"
