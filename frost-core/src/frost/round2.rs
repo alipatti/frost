@@ -1,5 +1,6 @@
 //! FROST Round 2 functionality and types, for signature share generation
 
+use serde::{Deserialize, Serialize};
 use std::fmt::{self, Debug};
 
 use crate::{
@@ -9,7 +10,7 @@ use crate::{
 };
 
 /// A representation of a single signature share used in FROST structures and messages.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct SignatureResponse<C: Ciphersuite> {
     /// The scalar contribution to the group signature.
     pub z_share: Scalar<C>,
@@ -29,7 +30,9 @@ where
     }
 
     /// Serialize [`SignatureResponse`] to bytes
-    pub fn to_bytes(&self) -> <<C::Group as Group>::Field as Field>::Serialization {
+    pub fn to_bytes(
+        &self,
+    ) -> <<C::Group as Group>::Field as Field>::Serialization {
         <<C::Group as Group>::Field>::serialize(&self.z_share)
     }
 }
@@ -59,7 +62,7 @@ where
 
 /// A participant's signature share, which the coordinator will aggregate with all other signer's
 /// shares into the joint signature.
-#[derive(Clone, Copy, Eq, PartialEq)]
+#[derive(Clone, Copy, Eq, PartialEq, Serialize, Deserialize)]
 pub struct SignatureShare<C: Ciphersuite> {
     /// Represents the participant identifier.
     pub identifier: Identifier<C>,
@@ -90,7 +93,8 @@ where
         challenge: &Challenge<C>,
     ) -> Result<(), Error<C>> {
         if (<C::Group>::generator() * self.signature.z_share)
-            != (group_commitment_share.0 + (public_key.0 * challenge.0 * lambda_i))
+            != (group_commitment_share.0
+                + (public_key.0 * challenge.0 * lambda_i))
         {
             return Err(Error::InvalidSignatureShare {
                 signer: self.identifier,
@@ -138,7 +142,8 @@ pub fn sign<C: Ciphersuite>(
 ) -> Result<SignatureShare<C>, Error<C>> {
     // Encodes the signing commitment list produced in round one as part of generating [`BindingFactor`], the
     // binding factor.
-    let binding_factor_list: frost::BindingFactorList<C> = signing_package.into();
+    let binding_factor_list: frost::BindingFactorList<C> =
+        signing_package.into();
     let binding_factor: frost::BindingFactor<C> =
         binding_factor_list[key_package.identifier].clone();
 
@@ -146,7 +151,10 @@ pub fn sign<C: Ciphersuite>(
     let group_commitment = GroupCommitment::<C>::try_from(signing_package)?;
 
     // Compute Lagrange coefficient.
-    let lambda_i = frost::derive_lagrange_coeff(key_package.identifier(), signing_package)?;
+    let lambda_i = frost::derive_lagrange_coeff(
+        key_package.identifier(),
+        signing_package,
+    )?;
 
     // Compute the per-message challenge.
     let challenge = challenge::<C>(

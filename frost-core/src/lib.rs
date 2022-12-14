@@ -24,6 +24,7 @@ pub mod tests;
 mod verifying_key;
 
 pub use error::{Error, FieldError, GroupError};
+use serde::{de::DeserializeOwned, Serialize};
 pub use signature::Signature;
 pub use signing_key::SigningKey;
 pub use verifying_key::VerifyingKey;
@@ -44,7 +45,9 @@ pub trait Field: Copy + Clone {
         + Eq
         + Mul<Output = Self::Scalar>
         + PartialEq
-        + Sub<Output = Self::Scalar>;
+        + Sub<Output = Self::Scalar>
+        + Serialize
+        + DeserializeOwned;
 
     /// A unique byte array buf of fixed length N.
     type Serialization: AsRef<[u8]> + Debug + TryFrom<Vec<u8>>;

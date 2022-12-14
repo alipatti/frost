@@ -5,6 +5,8 @@ use std::{
     hash::{Hash, Hasher},
 };
 
+use serde::{Deserialize, Serialize};
+
 use crate::{Ciphersuite, Error, Field, FieldError, Group, Scalar};
 
 /// A FROST participant identifier.
@@ -12,7 +14,7 @@ use crate::{Ciphersuite, Error, Field, FieldError, Group, Scalar};
 /// The identifier is a field element in the scalar field that the secret polynomial is defined
 /// over, corresponding to some x-coordinate for a polynomial f(x) = y.  MUST NOT be zero in the
 /// field, as f(0) = the shared secret.
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Identifier<C: Ciphersuite>(Scalar<C>);
 
 impl<C> Identifier<C>
